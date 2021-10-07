@@ -24,7 +24,7 @@ public class Application {
   private Game game;
 
   // This is a constructor
-  private Application(String[] args) throws IOException {
+  private Application(String[] args) {
     String pool = DEFAULT_POOL;
     int length = DEFAULT_LENGTH;
 
@@ -50,20 +50,28 @@ public class Application {
   }
 
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args)  {
 
-    Application application = new Application(args);
-    application.startGame();
-    boolean solved;
-    do {
-      String text = application.getGuess();
-      Guess guess = application.submitGuess(text);
-      application.printGuessResults(guess);
-      solved = guess.isSolution();
-    } while (!solved);
+    try {
+      Application application = new Application(args);
+      application.startGame();
+      boolean solved = false;
+      do {
+        try {
+          String text = application.getGuess();
+          Guess guess = application.submitGuess(text);
+          application.printGuessResults(guess);
+          solved = guess.isSolution();
 
-
-
+        } catch (BadGuessException e) {
+          System.out.println("Invalid guess. Please try again");
+        }
+      } while (!solved);
+    } catch (IOException e) {
+      System.out.println("Unable to connect to codebreaker service.");
+    } catch (BadGameException e) {
+      System.out.println("Invalid pool or code length.");
+    }
   }
 
   private void startGame() throws IOException, BadGameException {
